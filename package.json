@@ -2,7 +2,7 @@
   "name": "asd-music",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://First-Launch.github.io/ASD-Music",
+  "homepage": "/",
   "dependencies": {
     "@emotion/react": "^11.13.0",
     "@emotion/styled": "^11.13.0",
