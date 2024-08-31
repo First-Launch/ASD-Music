@@ -7,7 +7,6 @@ export const signInWithGoogle = async () => {
   const provider = new GoogleAuthProvider();
   try {
     const result = await signInWithPopup(auth, provider);
-    console.log("Signed in with Google:", result.user);
   } catch (error) {
     console.error("Google sign-in error:", error);
   }
@@ -16,7 +15,6 @@ export const signInWithGoogle = async () => {
 export const signUpWithEmailAndPassword = async (email: string, password: string) => {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    console.log("User signed up:", userCredential.user);
   } catch (error) {
     console.error("Error signing up with email and password:", error);
   }
