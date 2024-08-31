@@ -10,7 +10,6 @@ import SettingsPage from "./pages/settings/Settings";
 import MusicLibraryPage from "./pages/music/MusicLibrary"; // Import the music library page
 import AboutPage from "./pages/about/About";
 import NotFoundPage from "./pages/notFound/NotFound";
-import NavBar from "./components/nav/NavBar";
 import { useAuth } from "./contexts/AuthContext";
 import InstrumentsInventoryPage from "./pages/instruments/InstrumentsInventoryPage";
 import './App.css';  // Ensure this line is here to import your CSS
