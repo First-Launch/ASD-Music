@@ -58,7 +58,7 @@ const TitleBar: React.FC<TitleBarProps> = ({ showBack, title, actions, showDrawe
         navigate(path);
     };
 
-    if (location.pathname == "/") {
+    if (location.pathname === "/") {
         navItems = [
             { text: "Events", path: "/events", icon: <Event /> },
             { text: "About", path: "/about", icon: <Info /> },

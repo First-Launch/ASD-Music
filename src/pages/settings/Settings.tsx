@@ -4,6 +4,8 @@ import React from "react";
 import { Container, Typography, Box, Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import PageLayout from "../../components/templates/PageLayout";
+import { SystemUpdate } from "@mui/icons-material";
+import { APP_VERSION } from "../../utils/consts";
 
 const SettingsPage: React.FC = () => {
   const navigate = useNavigate();
@@ -36,8 +38,18 @@ const SettingsPage: React.FC = () => {
             Back to Dashboard
           </Button>
         </Box>
+        {/* Box should be pushed ot the end */}
+        <Box display={"flex"} flexDirection={"column"} alignItems={"center"} justifyContent={"flex-end"} height={"100%"} mt={4}>
+          <Typography variant="body1" component="p" align="center">
+            App Version: {APP_VERSION}
+          </Typography>
+          <Button onClick={() => window.location.reload()}>
+            <SystemUpdate />
+            Check for Updates
+          </Button>
+        </Box>
       </Container>
-    </PageLayout>
+    </PageLayout >
   );
 };
 

@@ -1,9 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Typography,
     useMediaQuery,
     useTheme,
     BottomNavigation,
@@ -14,8 +10,8 @@ import {
     CircularProgress,
     Fade,
 } from "@mui/material";
-import { Dashboard, Settings, Person, ArrowBack, LibraryMusic, Piano } from "@mui/icons-material";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Dashboard, Settings, LibraryMusic, Piano } from "@mui/icons-material";
+import { Link, useLocation } from "react-router-dom";
 import TitleBar from "../nav/TitleBar";
 
 // PageLayout Component
@@ -58,7 +54,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
             setNavValue(3);
         else
             setNavValue(0);
-    }, [title]);
+    }, [title, location.pathname]);
 
     // Handle pull-to-refresh logic
     const handleTouchStart = (event: TouchEvent) => {
@@ -137,7 +133,7 @@ const PageLayout: React.FC<PageLayoutProps> = ({
             </Box>
 
             {/* Bottom navigation for mobile devices */}
-            {isMobile && location.pathname !== "/" && (
+            {isMobile && location.pathname.startsWith("/dashboard") && (
                 <Paper sx={{ position: "fixed", bottom: 0, left: 0, right: 0, pb: 2.5 }} elevation={3} >
                     <BottomNavigation showLabels value={navValue} onChange={(event, newValue) => { setNavValue(newValue); }}>
                         <BottomNavigationAction

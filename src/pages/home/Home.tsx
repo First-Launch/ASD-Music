@@ -1,16 +1,13 @@
 import React, { useState } from "react";
-import { Container, Typography, Box, Drawer, useMediaQuery, useTheme, IconButton } from "@mui/material";
+import { Container, Typography, Box } from "@mui/material";
 import PageHead from "../../components/Header";
 import PageLayout from "../../components/templates/PageLayout";
-import { Menu } from '@mui/icons-material';
 
 const HomePage: React.FC = () => {
   const placeholderText =
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
-  const theme = useTheme();
-
   const [isLoading, setIsLoading] = useState(false); // State to control loading spinner
-  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  // const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   var actions: React.ReactNode;
 
   // Define the refresh handler function

@@ -5,7 +5,7 @@ import { useAuth } from "../../contexts/AuthContext";
 import PageLayout from "../../components/templates/PageLayout";
 
 const DashboardPage: React.FC = () => {
-  const { isAuthenticated, logout, currentUser } = useAuth(); // Access authentication context
+  const { logout } = useAuth(); // Access authentication context
 
   const navigate = useNavigate();
 

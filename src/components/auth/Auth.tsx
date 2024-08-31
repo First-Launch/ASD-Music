@@ -1,7 +1,7 @@
 // src/components/SignInSignUp.tsx
 
 import React, { useState } from "react";
-import { Container, TextField, Button, Box, Typography, Grid, Link } from "@mui/material";
+import { Container, TextField, Button, Box, Typography, Grid, Link, Divider } from "@mui/material";
 import { signInWithEmailAndPasswordFunc, signUpWithEmailAndPassword, signInWithGoogle } from "../../services/authService";
 
 const SignInSignUp = () => {
@@ -68,13 +68,15 @@ const SignInSignUp = () => {
           >
             {isSignUp ? "Sign Up" : "Sign In"}
           </Button>
+          <Divider sx={{ mb: 2 }}>OR</Divider>
           <Button
             fullWidth
             variant="outlined"
             sx={{ mb: 2 }}
             onClick={signInWithGoogle}
           >
-            Sign in with Google
+            {isSignUp ? "Sign Up " : "Sign In "}
+            with Google
           </Button>
           <Grid container>
             <Grid item>
