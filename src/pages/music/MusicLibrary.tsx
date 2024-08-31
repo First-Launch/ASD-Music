@@ -1,26 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import {
-  Container, Grid, Card, CardContent, CardMedia, Typography, Box, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, TablePagination, MenuItem, FormControl, Select, InputLabel, SelectChangeEvent
+  Container, Grid, Card, CardContent, CardMedia, Typography, Box, TextField, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, IconButton, Button, Dialog, DialogTitle, DialogContent, DialogActions, TablePagination, MenuItem, FormControl, Select, InputLabel, SelectChangeEvent,
+  useTheme,
+  useMediaQuery
 } from "@mui/material";
 import { collection, getDocs, addDoc, doc, updateDoc } from "firebase/firestore";
 import { firestore } from "../../firebase/firebase";
-import { Headset, Edit } from "@mui/icons-material";
+import { Headset, Edit, Add, QrCodeScanner } from "@mui/icons-material";
 import PageLayout from "../../components/templates/PageLayout";
-
-interface MusicDocument {
-  id: string;
-  title: string;
-  composer: string;
-  arranger?: string;
-  description: string;
-  notes: string;
-  audioUrl?: string;
-  infoUrl?: string;
-  coverImageUrl?: string;
-  gradeLow: string;
-  gradeHigh: string;
-  type: string;
-}
+import Scanner from "../../components/Scanner";
+import { MusicDocument } from "../../utils/databaseModels";
+import { Result } from "react-zxing";
+import { Exception } from "@zxing/library";
 
 const MusicLibraryPage: React.FC = () => {
   const [musicDocs, setMusicDocs] = useState<MusicDocument[]>([]);
@@ -31,6 +22,9 @@ const MusicLibraryPage: React.FC = () => {
   const audioRef = useRef<HTMLAudioElement>(null);
   const [open, setOpen] = useState(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [scannerModel, setScannerModel] = useState<boolean>(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const [newSong, setNewSong] = useState<MusicDocument>({
     id: '',
@@ -160,28 +154,69 @@ const MusicLibraryPage: React.FC = () => {
     setPage(0);
   };
 
+  const openScanner = () => {
+    setScannerModel(true);
+  }
+
+  const closeScanner = () => {
+    setScannerModel(false);
+  }
+
+  const onScan = (result: Result) => {
+    setSearchQuery(result.getText());
+    closeScanner();
+  }
+
+  const onScanDecodeError = (error: Exception) => {
+    console.error(error.message);
+  }
+
+  const onScanError = (error: unknown) => {
+    console.error(error);
+  }
   return (
-    <PageLayout title="Music" showTitleBar={true}>
+    <PageLayout title="Music" showTitleBar={true}
+      actions={[
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            handleOpen();
+          }}
+          sx={{ color: "inherit" }}
+        >
+          <Add />
+        </IconButton>,
+        <IconButton
+          onClick={(e) => {
+            e.stopPropagation();
+            openScanner();
+          }}
+          sx={{ color: "inherit" }}
+        >
+          <QrCodeScanner />
+        </IconButton>
+      ]}>
       <Container maxWidth="lg" sx={{ mt: 4 }}>
         <Grid container spacing={4}>
           {/* Search Bar and Add Song Button */}
-          <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <Grid gap={2} item xs={12} sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <TextField
               fullWidth
               label="Search Music"
               variant="outlined"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              sx={{ mr: 2 }}
             />
-            <Button variant="contained" color="primary" onClick={() => handleOpen()}>
-              Add New Song
-            </Button>
+            {!isMobile && (
+              <Button variant="contained" color="primary" onClick={() => handleOpen()}>
+                Add New Song
+              </Button>
+            )}
           </Grid>
 
           {/* Music Table */}
           <Grid item xs={12} md={selectedMusic ? 8 : 12}>
-            <TableContainer component={Paper}>
+            <TableContainer component={Paper} sx={{ mb: (isMobile && playingMusic) ? 15 : 0 }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -246,8 +281,8 @@ const MusicLibraryPage: React.FC = () => {
             </TableContainer>
           </Grid>
 
-          {/* Audio Player and Info Card */}
-          {selectedMusic && (
+          {/* Info Card */}
+          {selectedMusic && !isMobile && (
             <Grid item xs={12} md={4}>
               <Card>
                 {selectedMusic.coverImageUrl && (
@@ -289,7 +324,7 @@ const MusicLibraryPage: React.FC = () => {
           <Box
             sx={{
               position: 'fixed',
-              bottom: 0,
+              bottom: isMobile ? 'calc(70px + env(safe-area-inset-bottom))' : 0,
               left: 0,
               right: 0,
               bgcolor: 'background.paper',
@@ -300,17 +335,33 @@ const MusicLibraryPage: React.FC = () => {
               boxShadow: 3,
             }}
           >
-            <Box>
-              <Typography variant="h6">{playingMusic.title}</Typography>
-              <Typography variant="body2" color="textSecondary">
-                {playingMusic.composer} {playingMusic.arranger && `arr. ${playingMusic.arranger}`}
-              </Typography>
-            </Box>
-            <audio ref={audioRef} controls style={{ width: '300px' }}>
-              <source src={playingMusic.audioUrl} type="audio/mp3" />
-              Your browser does not support the audio element.
-            </audio>
+            {isMobile ? (
+              <Box>
+                <Typography variant="h6">{playingMusic.title}</Typography>
+                <Typography variant="body2" color="textSecondary">
+                  {playingMusic.composer} {playingMusic.arranger && `arr. ${playingMusic.arranger}`}
+                </Typography>
+                <audio ref={audioRef} controls style={{ width: '100%' }}>
+                  <source src={playingMusic.audioUrl} type="audio/mp3" />
+                  Your browser does not support the audio element.
+                </audio>
+              </Box>
+            ) : (
+              <>
+                <Box>
+                  <Typography variant="h6">{playingMusic.title}</Typography>
+                  <Typography variant="body2" color="textSecondary">
+                    {playingMusic.composer} {playingMusic.arranger && `arr. ${playingMusic.arranger}`}
+                  </Typography>
+                </Box>
+                <audio ref={audioRef} controls style={{ width: '300px' }}>
+                  <source src={playingMusic.audioUrl} type="audio/mp3" />
+                  Your browser does not support the audio element.
+                </audio>
+              </>
+            )}
           </Box>
+
         )}
 
         {/* Add/Edit Song Modal */}
@@ -406,6 +457,62 @@ const MusicLibraryPage: React.FC = () => {
             </Button>
           </DialogActions>
         </Dialog>
+
+        {/* Scanner Modal */}
+        <Dialog open={scannerModel} onClose={() => setScannerModel(false)}>
+          <DialogTitle>Scan QR Code</DialogTitle>
+          <DialogContent>
+            <Scanner onDecodeResult={onScan} onDecodeError={onScanDecodeError} onError={onScanError} />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={closeScanner} color="secondary">
+              Cancel
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        {/* Mobile song dialog */}
+        {isMobile && selectedMusic && (
+          <Dialog open={!!selectedMusic} onClose={() => setSelectedMusic(null)}>
+            <DialogTitle>{selectedMusic.title}</DialogTitle>
+            <DialogContent>
+              {/* Image */}
+              {selectedMusic.coverImageUrl && (
+                <CardMedia
+                  component="img"
+                  height="300"
+                  image={selectedMusic.coverImageUrl}
+                  alt={selectedMusic.title}
+                />
+              )}
+              <Typography variant="subtitle1" color="textSecondary">
+                {selectedMusic.composer} {selectedMusic.arranger && `arr. ${selectedMusic.arranger}`}
+              </Typography>
+              <Typography variant="body2" color="textSecondary" sx={{ mt: 1, mb: 2 }}>
+                Grades: {selectedMusic.gradeLow} - {selectedMusic.gradeHigh}
+              </Typography>
+              <Typography variant="body2" sx={{ mb: 2 }}>
+                {selectedMusic.description}
+              </Typography>
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <IconButton
+                  color="primary"
+                  onClick={() => handleListenClick(selectedMusic)}
+                >
+                  <Headset />
+                </IconButton>
+              </Box>
+            </DialogContent>
+            <DialogActions>
+              <Button onClick={() => handleOpen(selectedMusic)} color="primary">
+                Edit
+              </Button>
+              <Button onClick={() => setSelectedMusic(null)} color="secondary">
+                Close
+              </Button>
+            </DialogActions>
+          </Dialog>
+        )}
       </Container>
     </PageLayout>
   );
